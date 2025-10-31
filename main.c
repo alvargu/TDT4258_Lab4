@@ -21,6 +21,7 @@
 
 
 void pinCtl_init(void);
+void sleepModeStby(void);
 void Task1_testUsart(void);
 void Task3a_busyWaiting(void);
 void Task3b_utilizePolling(void);
@@ -35,8 +36,8 @@ int main(void){
     pinCtl_init();
     // Uncomment the task that is desireable to use
     //Task1_testUsart();
-    Task3a_busyWaiting();
-    //Task3b_utilizePolling();
+    //Task3a_busyWaiting();
+    Task3b_utilizePolling();
     //Task4_
     //Task5_coreIndependentOperation
 
@@ -53,6 +54,11 @@ void pinCtl_init(void){
     PORTD.PINCTRLUPD = (0xFF ^ PIN2_bm);    // Excludes pin PD2 from the disable and pullup copy
     PORTE.PINCTRLUPD = 0xFF;
     PORTF.PINCTRLUPD = 0xFF;
+}
+
+void sleepModeStby(void){
+    // Sets the sleep mode to standby and enables sleep
+    SLPCTRL.CTRLA = SLEEP_MODE_STANDBY | SLEEP_ENABLE_gc;
 }
 
 void Task1_testUsart(void){
@@ -88,10 +94,6 @@ void Task3b_utilizePolling(void){
         // Turn LED on or off based on result
         if (AC0_status()) set_LED_off();
         else if (!AC0_status()) set_LED_on();
-        // sleep function here
+        sleepModeStby();
     }
-}
-
-ISR(TCA0_OVF_vect){
-    //
 }
