@@ -4,4 +4,6 @@ out/
 cmake/
 lib/
 .vscode/
-KOK/
+KOK
+README.md
+
