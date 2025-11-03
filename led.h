@@ -9,5 +9,6 @@
 void LED_init(void);
 void set_LED_on(void);
 void set_LED_off(void);
+void toggle_LED(void);
 
 #endif    // LED_H_
