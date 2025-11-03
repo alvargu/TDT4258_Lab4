@@ -4,7 +4,9 @@
  * @date 2025-10-28
  * @brief Main function
  */
-// #define F_CPU 4000000UL
+#include <avr/interrupt.h>
+#include <avr/sleep.h>
+#define F_CPU 4000000UL
 
 //#include <stdio.h>
 #include <avr/io.h>
@@ -12,6 +14,7 @@
 //#include <stdint.h>
 #include <stdbool.h>
 #include <util/delay.h>
+#include <avr/sleep.h>
 
 
 #include "timerCounter.h"
@@ -25,8 +28,8 @@ void sleepModeStby(void);
 void Task1_testUsart(void);
 void Task3a_busyWaiting(void);
 void Task3b_utilizePolling(void);
-//Task4_InterruptDrivenApproach
-//Task5_coreIndependentOperation
+void Task4_InterruptDrivenApproach(void);
+//void Task5_coreIndependentOperation(void);
 
 
 int main(void){
@@ -56,11 +59,6 @@ void pinCtl_init(void){
     PORTF.PINCTRLUPD = 0xFF;
 }
 
-void sleepModeStby(void){
-    // Sets the sleep mode to standby and enables sleep
-    SLPCTRL.CTRLA = SLEEP_MODE_STANDBY | SLEEP_ENABLE_gc;
-}
-
 void Task1_testUsart(void){
     // Init functions neccesary for task
     USART3_Init();
@@ -81,19 +79,66 @@ void Task3a_busyWaiting(void){
     }
 }
 
-// bool checkLight = false;
+
+/*
+ * Task 3b: Utilize polling with sleep mode standby
+*/
+// Approach that utilizes polling with sleep mode standby is clearly more energy efficient.
+// On the other hand, it is slightly more complex to implement and has a bit higher latency 
+// due to sleep mode wakeup time and only checking on a set interval.
 void Task3b_utilizePolling(void){
     // Init functions neccesary for task
-    AC0_init();
+    // AC0_init();
     LED_init();
     TCA0_init();
+    // Set sleep mode to standby
+    set_sleep_mode(SLEEP_MODE_STANDBY);
 
     // Run continuosly
     while (1) {
-        // Constantly check if Analog comparator is triggered or not.
-        // Turn LED on or off based on result
-        if (AC0_status()) set_LED_off();
-        else if (!AC0_status()) set_LED_on();
-        sleepModeStby();
+        // Enter sleep mode and wait for interrupt
+        sleep_mode();
     }
 }
+
+ISR(TCA0_OVF_vect) {
+    // Constantly check if Analog comparator is triggered or not.
+    // Turn LED on or off based on result
+    if (AC0_status()) set_LED_off();
+    else set_LED_on();
+    
+    // Clear interrupt flag
+    TCA0.SINGLE.INTFLAGS = TCA_SINGLE_OVF_bm;
+}
+/*
+ * End of Task 3b polling with sleep mode standby
+*/
+
+
+/*
+ * Task 4: Interrupt driven approach with sleep mode standby
+*/
+void Task4_InterruptDrivenApproach(void){
+    // Init functions neccesary for task
+    AC0_init();
+    LED_init();
+    //AC0_enableInterrupt();
+
+    // Run continuosly
+    while (1) {
+        // Enter sleep mode and wait for interrupt
+        sleep_mode();
+    }
+}
+
+
+
+/*
+ * End of Task 4 interrupt driven approach with sleep mode standby
+*/
+
+
+
+/*
+ * End of file main.c
+*/
