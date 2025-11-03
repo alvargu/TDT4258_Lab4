@@ -4,6 +4,7 @@
  * @date 2025-10-28
  * @brief Main function
  */
+
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 #define F_CPU 4000000UL
@@ -16,7 +17,7 @@
 #include <util/delay.h>
 #include <avr/sleep.h>
 
-
+#include "eventSystem.h"
 #include "timerCounter.h"
 #include "usart.h"
 #include "analogComparator.h"
@@ -157,9 +158,13 @@ ISR(AC0_AC_vect){
 */
 void Task5_coreIndependentOperation(void){
     // Init functions neccesary for task
-    AC0_interruptInit();
+    AC0_init();
     LED_init();
-    //AC0_enableInterrupt();
+    // Select a start state for the LED (on/off) based on current light state
+    if (AC0_status()) set_LED_off();
+    else set_LED_on();
+    
+    eventSystem_init();
 
     // Run continuosly
     while (1) {
