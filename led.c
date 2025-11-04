@@ -1,6 +1,7 @@
 #include "led.h"
 
 void LED_init(void) {
+     // Set pin PA2 (port A, pin 2) as an output
      PORTA.DIRSET = PIN2_bm;
 }
 void set_LED_on(void){
