@@ -77,6 +77,7 @@ void Task1_testUsart(void){
 */
 void Task3a_busyWaiting(void){
     // Init functions neccesary for task
+    // LED already initialized in main
     AC0_init();
 
     // Run continuosly
@@ -99,8 +100,8 @@ void Task3a_busyWaiting(void){
 // due to sleep mode wakeup time and only checking on a set interval.
 void Task3b_utilizePolling(void){
     // Init functions neccesary for task
-    // AC0_init();
-    LED_init();
+    // LED already initialized in main
+    AC0_init();
     TCA0_init();
     // Set sleep mode to standby
     set_sleep_mode(SLEEP_MODE_STANDBY);
@@ -112,6 +113,7 @@ void Task3b_utilizePolling(void){
     }
 }
 
+// Interrupt Service Routine for TCA0 overflow (happens every 10ms with current settings and F_CPU)
 ISR(TCA0_OVF_vect) {
     // Constantly check if Analog comparator is triggered or not.
     // Turn LED on or off based on result
@@ -135,7 +137,7 @@ ISR(TCA0_OVF_vect) {
  */
 void Task4_InterruptDrivenApproach(void){
     // Init functions neccesary for task
-    LED_init();
+    // LED already initialized in main
     AC0_interruptInit();
     
     // Disable interrupts
@@ -155,6 +157,7 @@ void Task4_InterruptDrivenApproach(void){
     }
 }
 
+// Interrupt Service Routine for Analog Comparator 0
 ISR(AC0_AC_vect){
     // Toggle LED (on -> off & off -> on)
     toggle_LED();
@@ -169,24 +172,25 @@ ISR(AC0_AC_vect){
 /*
  * Task 5: Core independent operation using event system and sleep mode standby
  * This approach is very energy efficient as the CPU can remain in sleep mode
- * while the event system handles the communication between peripherals.
- * This method would also free up CPU resources completely for other tasks if needed.
+ * while the event system handles the communication between peripherals. 
+ * The difference in powerconsumption compared to the interrupt driven approach is minimal, 
+ * but this method completely frees up the CPU for other tasks if needed.
 */
 void Task5_coreIndependentOperation(void){
     // Init functions neccesary for task
+    // LED already initialized in main
     AC0_init();
-    LED_init();
+    
     
     // initialize event system to link AC0 to PA2
     eventSystem_init();
-    
-    set_sleep_mode(SLEEP_MODE_STANDBY);
 
+    // Set sleep mode to standby
+    set_sleep_mode(SLEEP_MODE_STANDBY);
+    // Enter sleep mode and wait for interrupt
+    sleep_mode();
     // Run continuosly
-    while (1) {
-        // Enter sleep mode and wait for interrupt
-        sleep_mode();
-    }
+    while (1);
 }
 /*
  * End of Task 5
