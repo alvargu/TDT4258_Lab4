@@ -19,7 +19,7 @@ void AC0_init(void){
      AC0.DACREF = 25;
 
      // Enable Analog Comparator 0
-     AC0.CTRLA = AC_ENABLE_bm;  
+     AC0.CTRLA = AC_ENABLE_bm | AC_RUNSTDBY_bm;  
 }
 
 // Same as AC0_init but with interrupt settings added
@@ -50,3 +50,7 @@ uint8_t AC0_status(void){
      // Macro for on/off detection
      return ((AC0.STATUS & AC_CMPSTATE_bm) >> AC_CMPSTATE_bp);
 }
+
+/*
+ * End of file analogComparator.c
+*/

@@ -42,3 +42,7 @@ uint8_t USART3_Read()
     }
     return USART3.RXDATAL;
 }
+
+/*
+ * End of file usart.c
+*/

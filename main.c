@@ -42,8 +42,8 @@ int main(void){
     //Task1_testUsart();
     //Task3a_busyWaiting();
     //Task3b_utilizePolling();
-    Task4_InterruptDrivenApproach();
-    //Task5_coreIndependentOperation();
+    //Task4_InterruptDrivenApproach();
+    Task5_coreIndependentOperation();
 
     return 0;
 }
@@ -60,12 +60,21 @@ void pinCtl_init(void){
     PORTF.PINCTRLUPD = 0xFF;
 }
 
+/*
+ * Task 1: USART test
+ */
 void Task1_testUsart(void){
     // Init functions neccesary for task
     USART3_Init();
-    USART3_SendString("Hello, USART!");
+    USART3_SendString("Hello World!");
 }
+/*
+ * End of Task 1
+*/
 
+/*
+ * Task 3a: Busy-waiting approach
+*/
 void Task3a_busyWaiting(void){
     // Init functions neccesary for task
     AC0_init();
@@ -78,7 +87,9 @@ void Task3a_busyWaiting(void){
         else set_LED_on();
     }
 }
-
+/*
+ * End of task 3a
+*/
 
 /*
  * Task 3b: Utilize polling with sleep mode standby
@@ -100,7 +111,7 @@ void Task3b_utilizePolling(void){
         sleep_mode();
     }
 }
-/* Uncomment this if you want to run task 3b
+
 ISR(TCA0_OVF_vect) {
     // Constantly check if Analog comparator is triggered or not.
     // Turn LED on or off based on result
@@ -110,7 +121,6 @@ ISR(TCA0_OVF_vect) {
     // Clear interrupt flag
     TCA0.SINGLE.INTFLAGS = TCA_SINGLE_OVF_bm;
 }
-*/
 /*
  * End of Task 3b
 */
@@ -118,7 +128,11 @@ ISR(TCA0_OVF_vect) {
 
 /*
  * Task 4: Interrupt driven approach with sleep mode standby
-*/
+ * The interrupt driven approach is the most energy efficient as the CPU can remain in sleep mode
+ * until an event occurs that requires its attention. This minimizes power consumption during idle periods.
+ * However, the interrupt will stop other processes from running while the interrupt is being serviced,
+ * which can introduce latency for other tasks. For this certain application though this is not really an issue.
+ */
 void Task4_InterruptDrivenApproach(void){
     // Init functions neccesary for task
     LED_init();
@@ -147,24 +161,26 @@ ISR(AC0_AC_vect){
     // Clear Interruptflag when LED is toggled
     AC0.STATUS = AC_CMPIF_bm;
 }
-
 /*
  * End of Task 4
 */
 
 
 /*
- * Task 5: 
+ * Task 5: Core independent operation using event system and sleep mode standby
+ * This approach is very energy efficient as the CPU can remain in sleep mode
+ * while the event system handles the communication between peripherals.
+ * This method would also free up CPU resources completely for other tasks if needed.
 */
 void Task5_coreIndependentOperation(void){
     // Init functions neccesary for task
     AC0_init();
     LED_init();
-    // Select a start state for the LED (on/off) based on current light state
-    if (AC0_status()) set_LED_off();
-    else set_LED_on();
     
+    // initialize event system to link AC0 to PA2
     eventSystem_init();
+    
+    set_sleep_mode(SLEEP_MODE_STANDBY);
 
     // Run continuosly
     while (1) {
@@ -172,12 +188,9 @@ void Task5_coreIndependentOperation(void){
         sleep_mode();
     }
 }
-
-
 /*
  * End of Task 5
 */
-
 
 /*
  * End of file main.c

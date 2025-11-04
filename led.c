@@ -16,3 +16,7 @@ void toggle_LED(void){
      // LED is active low. Set pin HIGH to turn LED off
      PORTA.OUT ^= PIN2_bm;
 }
+
+/*
+ * End of file led.c
+*/

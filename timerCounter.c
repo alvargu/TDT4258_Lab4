@@ -16,3 +16,7 @@ void TCA0_init(void) {
     // Enable global interrupts after setup
     sei();
 }
+
+/*
+ * End of file timerCounter.c
+*/
