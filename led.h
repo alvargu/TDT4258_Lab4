@@ -2,8 +2,6 @@
 #define LED_H_
 
 #include <avr/io.h>
-//#include <string.h>
-//#include <stdint.h>
 #include <stdbool.h>
 
 void LED_init(void);
